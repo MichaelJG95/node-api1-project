@@ -47,11 +47,38 @@ server.get('/api/users/:id', (req, res) => {
 });
 
 server.delete('/api/users/:id', (req, res) => {
-    res.json("not implemented");
+    User.remove(req.params.id)
+        .then(user => {
+            if(!user) {
+                res.status(404).json({ message: "The user with the specified ID does not exist" })
+            } else {
+                res.json(user)
+            }
+        })
+        .catch(() => {
+            res.status(500).json({ message: "The user could not be removed" })
+        })
 });
 
 server.put('/api/users/:id', (req, res) => {
-    res.json("not implemented");
+    let id = req.params.id;
+    let changes = req.body
+
+    if(!changes.name || !changes.bio) {
+        res.status(400).json({ message: "Please provide name and bio for the user" })
+    } else {
+        User.update(id, changes)
+            .then(changedUser => {
+                if(!changedUser) {
+                    res.status(404).json({ message: "The user with the specified ID does not exist" })
+                } else {
+                    res.json(changedUser)
+                }
+            })
+            .catch(() => {
+                res.status(500).json({ message: "The user information could not be modified" })
+            })
+    }
 });
 
 
